@@ -1,11 +1,20 @@
-# Use the official Nginx image from Docker Hub
-FROM nginx:latest
+FROM python:3.9
 
-# Copy your static website files to the default directory
-COPY html /usr/share/nginx/html
+WORKDIR /app/backend
 
-# Expose port 80 for web traffic
-EXPOSE 80
+COPY requirements.txt /app/backend
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y gcc default-libmysqlclient-dev pkg-config \
+    && rm -rf /var/lib/apt/lists/*
 
-# Start Nginx
-CMD ["nginx", "-g", "daemon off;"]
+
+# Install app dependencies
+RUN pip install mysqlclient
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . /app/backend
+
+EXPOSE 8000
+#RUN python manage.py migrate
+#RUN python manage.py makemigrations
