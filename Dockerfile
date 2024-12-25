@@ -1,20 +1,16 @@
-FROM python:3.9
+# Use the official Nginx image as the base image
+FROM nginx:latest
 
-WORKDIR /app/backend
+# Copy your custom Nginx configuration file to the container
+# Replace "nginx.conf" with your configuration file name
+COPY nginx.conf /etc/nginx/nginx.conf
 
-COPY requirements.txt /app/backend
-RUN apt-get update \
-    && apt-get upgrade -y \
-    && apt-get install -y gcc default-libmysqlclient-dev pkg-config \
-    && rm -rf /var/lib/apt/lists/*
+# Copy your website's static files to the Nginx default directory
+# Replace "html" with your local folder containing website files
+COPY html /usr/share/nginx/html
 
+# Expose port 80 to allow web traffic
+EXPOSE 80
 
-# Install app dependencies
-RUN pip install mysqlclient
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . /app/backend
-
-EXPOSE 8000
-#RUN python manage.py migrate
-#RUN python manage.py makemigrations
+# Start Nginx when the container runs
+CMD ["nginx", "-g", "daemon off;"]
